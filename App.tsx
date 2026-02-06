@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   ChevronRight, 
@@ -25,9 +24,9 @@ import {
   Area,
   Cell
 } from 'recharts';
-import SlideWrapper from './components/SlideWrapper';
-import { PartnerData, AppState } from './types';
-import { fetchPartnerData } from './services/dataService';
+import SlideWrapper from './components/SlideWrapper.tsx';
+import { PartnerData, AppState } from './types.ts';
+import { fetchPartnerData } from './services/dataService.ts';
 
 const App: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -65,7 +64,6 @@ const App: React.FC = () => {
 
   return (
     <div className="relative h-screen w-screen bg-[#0a0000] text-white selection:bg-red-500">
-      {/* Progress Bar - Festive Red */}
       {appState === 'VIEWING' && (
         <div className="fixed top-0 left-0 w-full h-1 z-50 flex gap-1 px-1">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -77,7 +75,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Navigation Buttons - Red Style */}
       {appState === 'VIEWING' && (
         <div className="fixed bottom-8 left-0 w-full px-6 flex justify-between items-center z-50">
           <button 
@@ -100,9 +97,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Slides Container */}
       <main className="h-full w-full">
-        {/* Slide 1: Identification */}
         <SlideWrapper active={currentSlide === 0}>
           <div className="flex-1 flex flex-col items-center justify-center space-y-12">
             <div className="text-center space-y-4">
@@ -153,7 +148,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 2: Welcome */}
         <SlideWrapper active={currentSlide === 1}>
           <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8 px-4">
             <div className="w-20 h-20 bg-red-600/20 rounded-full flex items-center justify-center animate-bounce shadow-[0_0_30px_rgba(220,38,38,0.2)] border border-red-500/20">
@@ -168,7 +162,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 3: First Contact */}
         <SlideWrapper active={currentSlide === 2}>
           <div className="flex-1 flex flex-col space-y-12">
             <div className="space-y-4">
@@ -197,7 +190,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 4: 2025 Scale */}
         <SlideWrapper active={currentSlide === 3}>
           <div className="flex-1 flex flex-col space-y-10">
             <div className="space-y-4">
@@ -236,7 +228,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 5: Monthly Sales Chart */}
         <SlideWrapper active={currentSlide === 4}>
           <div className="flex-1 flex flex-col space-y-6">
             <div className="space-y-2">
@@ -273,7 +264,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 6: Top Product */}
         <SlideWrapper active={currentSlide === 5}>
           <div className="flex-1 flex flex-col space-y-12">
             <div className="space-y-4">
@@ -305,7 +295,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 7: Store Reach Bar Chart */}
         <SlideWrapper active={currentSlide === 6}>
           <div className="flex-1 flex flex-col space-y-6">
             <div className="space-y-2">
@@ -344,7 +333,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 8: Highlight Moment */}
         <SlideWrapper active={currentSlide === 7}>
           <div className="flex-1 flex flex-col space-y-12">
             <div className="space-y-4">
@@ -378,7 +366,6 @@ const App: React.FC = () => {
           </div>
         </SlideWrapper>
 
-        {/* Slide 9: Closing */}
         <SlideWrapper active={currentSlide === 8}>
           <div className="flex-1 flex flex-col items-center justify-center text-center space-y-16">
             <div className="space-y-6">

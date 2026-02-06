@@ -1,0 +1,11 @@
+
+/* 这是一个基础的 CSS 文件，用于满足构建工具的引用要求 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
