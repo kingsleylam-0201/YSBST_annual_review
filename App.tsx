@@ -24,9 +24,9 @@ import {
   Area,
   Cell
 } from 'recharts';
-import SlideWrapper from './components/SlideWrapper.tsx';
-import { PartnerData, AppState } from './types.ts';
-import { fetchPartnerData } from './services/dataService.ts';
+import SlideWrapper from './components/SlideWrapper';
+import { PartnerData, AppState } from './types';
+import { fetchPartnerData } from './services/dataService';
 
 const App: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);

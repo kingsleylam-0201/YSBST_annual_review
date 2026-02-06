@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { PartnerData } from '../types.ts';
+import { PartnerData } from '../types';
 
 const SUPABASE_URL = 'https://vsyqplhvkaqvzexxkdte.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzeXFwbGh2a2FxdnpleHhrZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODYxODIsImV4cCI6MjA4NTY2MjE4Mn0.MtiGJ-4bmTMFnf-I4PLcnHF9K1JCDbpche5hUGa3l00';
