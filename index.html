@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年度药师帮合作伙伴年度回顾</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #1a0505;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+        }
+        .gradient-bg {
+            background: radial-gradient(circle at top right, #450a0a, #1a0505, #0a0000);
+        }
+        .slide-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .slide-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 800ms, transform 800ms;
+        }
+        /* 喜庆粒子动画 */
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: float 10s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+    
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        import React, { useState, useEffect } from 'react';
+        import ReactDOM from 'react-dom/client';
+        import { 
+            ChevronRight, ChevronLeft, Search, TrendingUp, Calendar, 
+            Award, Store, Sparkles, AlertCircle, Gift, Heart 
+        } from 'lucide-react';
+        import { 
+            BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
+            ResponsiveContainer, AreaChart, Area, Cell 
+        } from 'recharts';
+        import { createClient } from '@supabase/supabase-js';
+
+        // --- 1. Data Service (Supabase) ---
+        const SUPABASE_URL = 'https://vsyqplhvkaqvzexxkdte.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzeXFwbGh2a2FxdnpleHhrZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODYxODIsImV4cCI6MjA4NTY2MjE4Mn0.MtiGJ-4bmTMFnf-I4PLcnHF9K1JCDbpche5hUGa3l00';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const fetchPartnerData = async (name) => {
+            const { data, error } = await supabase
+                .from('annual_reviews')
+                .select('*')
+                .eq('factory_name', name.trim())
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') throw new Error('未找到该厂家数据，请确认名称（需完全一致）');
+                throw new Error('网络请求失败，请稍后再试');
+            }
+            return {
+                manufacturerName: data.factory_name,
+                firstCooperationDate: data.first_cooperation_date,
+                firstProduct: data.first_product,
+                totalSales2025: Number(data.total_sales_2025),
+                yoyGrowth: Number(data.yoy_growth),
+                monthlySales: data.monthly_sales, 
+                topProduct: {
+                    name: data.top_product_name,
+                    totalSales: Number(data.top_product_total_sales),
+                    monthlyStores: data.top_product_monthly_stores, 
+                    highlightMoment: {
+                        month: data.highlight_month,
+                        amount: Number(data.highlight_amount),
+                        stores: Number(data.highlight_stores),
+                    },
+                },
+            };
+        };
+
+        // --- 2. Component: SlideWrapper ---
+        const SlideWrapper = ({ children, active }) => {
+            if (!active) return null;
+            
+            const sparkles = Array.from({ length: 12 }).map((_, i) => ({
+                id: i,
+                left: `${Math.random() * 100}%`,
+                size: `${Math.random() * 4 + 2}px`,
+                delay: `${Math.random() * 10}s`,
+                duration: `${Math.random() * 10 + 10}s`,
+            }));
+
+            return React.createElement('div', { 
+                className: "w-full h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden gradient-bg slide-enter slide-enter-active" 
+            }, [
+                React.createElement('div', { key: 'bg', className: "absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden" }, [
+                    React.createElement('div', { key: 'glow1', className: "absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-red-600/20 rounded-full blur-[120px]" }),
+                    React.createElement('div', { key: 'glow2', className: "absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[100px]" }),
+                    ...sparkles.map((s, i) => React.createElement('div', {
+                        key: `sparkle-${s.id}`,
+                        className: "sparkle",
+                        style: {
+                            left: s.left,
+                            bottom: '-20px',
+                            width: s.size,
+                            height: s.size,
+                            animationDelay: s.delay,
+                            animationDuration: s.duration,
+                            backgroundColor: i % 2 === 0 ? '#fbbf24' : '#ffffff',
+                            boxShadow: `0 0 10px ${i % 2 === 0 ? '#fbbf24' : '#ffffff'}`
+                        }
+                    }))
+                ]),
+                React.createElement('div', { key: 'content', className: "z-10 w-full max-w-lg h-full flex flex-col py-12" }, children)
+            ]);
+        };
+
+        // --- 3. Main App ---
+        const App = () => {
+            const [currentSlide, setCurrentSlide] = useState(0);
+            const [appState, setAppState] = useState('IDLE');
+            const [nameInput, setNameInput] = useState('');
+            const [data, setData] = useState(null);
+            const [errorMsg, setErrorMsg] = useState(null);
+
+            const handleStart = async () => {
+                if (!nameInput.trim()) return;
+                setAppState('LOADING');
+                setErrorMsg(null);
+                try {
+                    const result = await fetchPartnerData(nameInput);
+                    setData(result);
+                    setAppState('VIEWING');
+                    setCurrentSlide(1); 
+                } catch (error) {
+                    setErrorMsg(error.message || "获取数据失败");
+                    setAppState('IDLE');
+                }
+            };
+
+            const next = () => setCurrentSlide(prev => Math.min(prev + 1, 8));
+            const prev = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
+            const reset = () => {
+                setAppState('IDLE');
+                setCurrentSlide(0);
+                setNameInput('');
+                setData(null);
+                setErrorMsg(null);
+            };
+
+            return React.createElement('div', { className: "relative h-screen w-screen bg-[#0a0000] text-white selection:bg-red-500" }, [
+                // Progress Bar
+                appState === 'VIEWING' && React.createElement('div', { key: 'pb', className: "fixed top-0 left-0 w-full h-1 z-50 flex gap-1 px-1" }, 
+                    Array.from({ length: 9 }).map((_, i) => React.createElement('div', {
+                        key: i,
+                        className: `h-full flex-1 transition-all duration-700 ${i <= currentSlide ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-red-950/40'}`
+                    }))
+                ),
+
+                // Nav Buttons
+                appState === 'VIEWING' && React.createElement('div', { key: 'nav', className: "fixed bottom-8 left-0 w-full px-6 flex justify-between items-center z-50" }, [
+                    React.createElement('button', { key: 'prev', onClick: currentSlide === 0 ? reset : prev, className: "p-3 rounded-full bg-red-950/30 backdrop-blur-md border border-red-900/50 text-red-400" }, React.createElement(ChevronLeft, { size: 24 })),
+                    React.createElement('div', { key: 'page', className: "text-xs font-mono text-red-900/80 tracking-widest uppercase font-bold" }, `${currentSlide + 1} / 9`),
+                    React.createElement('button', { key: 'next', onClick: currentSlide === 8 ? reset : next, className: "p-3 rounded-full bg-gradient-to-br from-red-600 to-red-800 text-white shadow-lg" }, 
+                        currentSlide === 8 ? React.createElement(Heart, { size: 24 }) : React.createElement(ChevronRight, { size: 24 })
+                    )
+                ]),
+
+                // Slides
+                React.createElement('main', { key: 'main', className: "h-full w-full" }, [
+                    // Slide 0: Start
+                    React.createElement(SlideWrapper, { key: 's0', active: currentSlide === 0 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col items-center justify-center space-y-12" }, [
+                            React.createElement('div', { className: "text-center space-y-4" }, [
+                                React.createElement('div', { className: "inline-block px-4 py-1 rounded-full border border-red-500/30 bg-red-500/10 text-red-400 text-sm font-bold uppercase" }, "2025 Partner Annual Review"),
+                                React.createElement('h1', { className: "text-5xl font-black tracking-tight" }, [
+                                    "药师帮合作伙伴", React.createElement('br'),
+                                    React.createElement('span', { className: "text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-500" }, "年度回顾")
+                                ]),
+                                React.createElement('p', { className: "text-red-200/60" }, "输入厂家名称，开启属于我们的鸿运 2025。")
+                            ]),
+                            React.createElement('div', { className: "w-full space-y-4" }, [
+                                React.createElement('div', { className: "relative" }, [
+                                    React.createElement('div', { className: "absolute inset-y-0 left-0 pl-4 flex items-center" }, React.createElement(Search, { className: "text-red-900/60", size: 20 })),
+                                    React.createElement('input', {
+                                        type: "text", placeholder: "请输入厂家全称...", value: nameInput,
+                                        onChange: (e) => setNameInput(e.target.value),
+                                        onKeyDown: (e) => e.key === 'Enter' && handleStart(),
+                                        className: `block w-full pl-12 pr-4 py-4 bg-red-950/20 border ${errorMsg ? 'border-red-500' : 'border-red-900/30'} rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all`
+                                    })
+                                ]),
+                                errorMsg && React.createElement('div', { className: "text-red-400 text-sm flex items-center gap-1" }, [React.createElement(AlertCircle, { size: 14 }), errorMsg]),
+                                React.createElement('button', {
+                                    onClick: handleStart, disabled: !nameInput.trim() || appState === 'LOADING',
+                                    className: "w-full py-4 bg-gradient-to-r from-red-700 to-red-600 text-white font-bold rounded-2xl shadow-xl flex items-center justify-center gap-2"
+                                }, appState === 'LOADING' ? "加载中..." : "生成年度报告")
+                            ])
+                        ])
+                    ]),
+
+                    // Slide 1: Welcome
+                    React.createElement(SlideWrapper, { key: 's1', active: currentSlide === 1 }, 
+                        React.createElement('div', { className: "flex-1 flex flex-col items-center justify-center text-center space-y-8" }, [
+                            React.createElement('div', { className: "w-20 h-20 bg-red-600/20 rounded-full flex items-center justify-center animate-bounce shadow-xl" }, React.createElement(Gift, { className: "text-red-400", size: 40 })),
+                            React.createElement('h2', { className: "text-3xl font-bold leading-relaxed" }, [
+                                "致敬每一个愿意", React.createElement('br'),
+                                React.createElement('span', { className: "text-amber-500 underline decoration-amber-500/50" }, "拥抱变化"), "、", React.createElement('br'), "笃定携手同行的伙伴。"
+                            ]),
+                            React.createElement('p', { className: "text-red-300/60 font-medium" }, `2025 鸿运当头 · ${data?.manufacturerName}`)
+                        ])
+                    ),
+
+                    // Slide 2: First Contact
+                    React.createElement(SlideWrapper, { key: 's2', active: currentSlide === 2 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col space-y-12" }, [
+                            React.createElement('div', { className: "space-y-4" }, [React.createElement(Calendar, { className: "text-red-500", size: 40 }), React.createElement('h3', { className: "text-2xl font-bold" }, "故事的起点")]),
+                            React.createElement('div', { className: "bg-red-950/20 p-8 rounded-3xl border border-red-900/30 space-y-6" }, [
+                                React.createElement('div', {}, [React.createElement('p', { className: "text-red-400/60 text-sm font-bold" }, "首次动销时间"), React.createElement('p', { className: "text-3xl font-black text-red-500" }, data?.firstCooperationDate)]),
+                                React.createElement('div', { className: "h-[1px] bg-red-900/30 w-full" }),
+                                React.createElement('div', {}, [React.createElement('p', { className: "text-red-400/60 text-sm" }, "首个合作产品"), React.createElement('p', { className: "text-xl font-bold" }, data?.firstProduct)])
+                            ]),
+                            React.createElement('p', { className: "text-red-100/60" }, `${data?.manufacturerName} 与药师帮开启了跨越山海的连接。`)
+                        ])
+                    ]),
+
+                    // Slide 3: Scale
+                    React.createElement(SlideWrapper, { key: 's3', active: currentSlide === 3 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col space-y-10" }, [
+                            React.createElement('div', { className: "space-y-4" }, [React.createElement(TrendingUp, { className: "text-red-500", size: 40 }), React.createElement('h3', { className: "text-2xl font-bold" }, "25年合作规模")]),
+                            React.createElement('div', { className: "bg-gradient-to-br from-red-700 to-rose-900 p-8 rounded-3xl shadow-2xl" }, [
+                                React.createElement('p', { className: "text-red-100/70 text-sm font-bold" }, "年度合作销售总额"),
+                                React.createElement('div', { className: "flex items-baseline gap-1" }, [
+                                    React.createElement('span', { className: "text-4xl text-amber-400 font-black" }, "¥"),
+                                    React.createElement('span', { className: "text-5xl font-black" }, (data?.totalSales2025 || 0).toLocaleString())
+                                ])
+                            ]),
+                            React.createElement('div', { className: "flex gap-4" }, [
+                                React.createElement('div', { className: "flex-1 bg-red-950/20 border border-red-900/30 p-6 rounded-3xl" }, [
+                                    React.createElement('p', { className: "text-red-400/60 text-xs font-bold" }, "同比24年增长"),
+                                    React.createElement('p', { className: "text-3xl font-black text-amber-500" }, `+${data?.yoyGrowth}%`)
+                                ]),
+                                React.createElement('div', { className: "flex-1 bg-red-950/20 border border-red-900/30 p-6 rounded-3xl flex items-center justify-center" }, 
+                                    React.createElement('div', { className: "text-red-500 flex items-center gap-1 font-bold italic" }, [React.createElement(TrendingUp, { size: 16 }), "势不可挡"])
+                                )
+                            ])
+                        ])
+                    ]),
+
+                    // Slide 4: Monthly Chart (Simple Recharts integration)
+                    React.createElement(SlideWrapper, { key: 's4', active: currentSlide === 4 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col space-y-6" }, [
+                            React.createElement('div', {}, [React.createElement('h3', { className: "text-2xl font-bold" }, "月度销售轨迹"), React.createElement('p', { className: "text-red-400/60 text-sm" }, "2025年1月 - 12月 销售趋势")]),
+                            React.createElement('div', { className: "flex-1 min-h-[300px] w-full bg-red-950/10 border border-red-900/20 p-4 rounded-3xl" }, 
+                                React.createElement(ResponsiveContainer, { width: '100%', height: '100%' }, 
+                                    React.createElement(AreaChart, { data: data?.monthlySales }, [
+                                        React.createElement('defs', { key: 'def' }, 
+                                            React.createElement('linearGradient', { id: "colorSales", x1: "0", y1: "0", x2: "0", y2: "1" }, [
+                                                React.createElement('stop', { offset: "5%", stopColor: "#ef4444", stopOpacity: 0.4 }),
+                                                React.createElement('stop', { offset: "95%", stopColor: "#ef4444", stopOpacity: 0 })
+                                            ])
+                                        ),
+                                        React.createElement(CartesianGrid, { key: 'grid', strokeDasharray: "3 3", stroke: "#450a0a", vertical: false }),
+                                        React.createElement(XAxis, { key: 'xaxis', dataKey: "month", stroke: "#991b1b", fontSize: 10 }),
+                                        React.createElement(Tooltip, { key: 'tt', contentStyle: { backgroundColor: '#450a0a', border: 'none' } }),
+                                        React.createElement(Area, { key: 'area', type: "monotone", dataKey: "amount", stroke: "#ef4444", fill: "url(#colorSales)" })
+                                    ])
+                                )
+                            )
+                        ])
+                    ]),
+
+                    // Slide 5: Top Product
+                    React.createElement(SlideWrapper, { key: 's5', active: currentSlide === 5 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col space-y-12" }, [
+                            React.createElement('div', { className: "space-y-4" }, [React.createElement(Award, { className: "text-amber-500", size: 40 }), React.createElement('h3', { className: "text-2xl font-bold" }, "2025 年度产品")]),
+                            React.createElement('div', { className: "bg-red-950/30 border border-red-500/20 p-8 rounded-3xl text-center space-y-6 backdrop-blur" }, [
+                                React.createElement('div', { className: "w-24 h-24 bg-gradient-to-tr from-red-600 to-amber-600 rounded-full mx-auto flex items-center justify-center" }, React.createElement(Award, { className: "text-white", size: 48 })),
+                                React.createElement('h4', { className: "text-2xl font-black" }, data?.topProduct.name),
+                                React.createElement('div', { className: "pt-4 border-t border-red-900/30 flex justify-center" }, 
+                                    React.createElement('div', {}, [React.createElement('p', { className: "text-red-400/60 text-xs font-bold" }, "年度单品销额"), React.createElement('p', { className: "text-xl font-bold" }, `¥${((data?.topProduct.totalSales || 0) / 10000).toFixed(0)}万+`)])
+                                )
+                            ])
+                        ])
+                    ]),
+
+                    // Slide 6: Bar Chart
+                    React.createElement(SlideWrapper, { key: 's6', active: currentSlide === 6 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col space-y-6" }, [
+                            React.createElement('h3', { className: "text-xl font-bold" }, "单品渠道渗透"),
+                            React.createElement('div', { className: "flex-1 min-h-[300px] bg-red-950/10 border border-red-900/20 p-4 rounded-3xl" }, 
+                                React.createElement(ResponsiveContainer, { width: '100%', height: '100%' }, 
+                                    React.createElement(BarChart, { data: data?.topProduct.monthlyStores }, [
+                                        React.createElement(XAxis, { dataKey: "month", stroke: "#991b1b", fontSize: 10 }),
+                                        React.createElement(Bar, { dataKey: "amount", fill: "#ef4444", radius: [4, 4, 0, 0] })
+                                    ])
+                                )
+                            )
+                        ])
+                    ]),
+
+                    // Slide 7: Highlight
+                    React.createElement(SlideWrapper, { key: 's7', active: currentSlide === 7 }, [
+                        React.createElement('div', { className: "flex-1 flex flex-col space-y-12" }, [
+                            React.createElement('h3', { className: "text-2xl font-bold" }, "高光时刻"),
+                            React.createElement('div', { className: "bg-red-950/20 border-2 border-amber-500/20 p-8 rounded-[40px] space-y-8" }, [
+                                React.createElement('div', {}, [React.createElement('p', { className: "text-amber-500 font-black italic" }, "Moment of Glory"), React.createElement('h4', { className: "text-5xl font-black" }, data?.topProduct.highlightMoment.month)]),
+                                React.createElement('div', { className: "grid gap-4" }, [
+                                    React.createElement('div', { className: "bg-red-900/20 p-6 rounded-3xl" }, [React.createElement('p', { className: "text-red-400/60 text-xs font-bold" }, "单月最高销额"), React.createElement('p', { className: "text-3xl font-black text-amber-500" }, `¥${(data?.topProduct.highlightMoment.amount || 0).toLocaleString()}`)]),
+                                    React.createElement('div', { className: "bg-red-900/20 p-6 rounded-3xl" }, [React.createElement('p', { className: "text-red-400/60 text-xs font-bold" }, "单月采购店数"), React.createElement('p', { className: "text-3xl font-black text-amber-500" }, `${(data?.topProduct.highlightMoment.stores || 0).toLocaleString()} 家`)])
+                                ])
+                            ])
+                        ])
+                    ]),
+
+                    // Slide 8: Closing
+                    React.createElement(SlideWrapper, { key: 's8', active: currentSlide === 8 }, 
+                        React.createElement('div', { className: "flex-1 flex flex-col items-center justify-center text-center space-y-16" }, [
+                            React.createElement('div', { className: "space-y-6" }, [
+                                React.createElement('div', { className: "text-transparent bg-clip-text bg-gradient-to-b from-white to-red-400 text-4xl font-black" }, ["一路同行，", React.createElement('br'), "共赴山海。"]),
+                                React.createElement('div', { className: "w-16 h-1 bg-amber-500 mx-auto rounded-full" })
+                            ]),
+                            React.createElement('div', { className: "space-y-4" }, [
+                                React.createElement('p', { className: "text-red-400/60 font-bold tracking-widest" }, "2025 YSB Annual Review"),
+                                React.createElement('div', { className: "bg-red-900/40 border border-red-800/40 py-3 px-8 rounded-full" }, React.createElement('p', { className: "text-amber-500 font-bold" }, "药师帮首推项目部 敬上"))
+                            ]),
+                            React.createElement('button', { onClick: reset, className: "text-red-500/60 text-sm font-bold" }, "再看一次")
+                        ])
+                    )
+                ])
+            ]);
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
